@@ -1,4 +1,4 @@
-﻿module CQRS {
+﻿export module CQRS {
     export class AggregateRoot {
         events: string[];
 

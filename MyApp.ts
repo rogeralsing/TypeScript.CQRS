@@ -1,9 +1,8 @@
 ﻿/// <reference path="Weaver.ts"/>
-/// <reference path="CQRS.ts"/>
 
+import cqrs = module('CQRS');
 
-
-class Person extends CQRS.AggregateRoot {
+class Person extends cqrs.CQRS.AggregateRoot {
 	
     private firstname: string;
     private lastname: string;
