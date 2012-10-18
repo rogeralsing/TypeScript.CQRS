@@ -1,4 +1,4 @@
-﻿module Weaver {
+﻿export module Weaver {
     export function makeInterceptType(type: any) {
         var typeName = getFunctionName(type);
 
@@ -19,8 +19,10 @@
             var jsonObj = {};
             var jsonArgs = {};
 
-            for (var i = 0; i < paramNames.length; i++) {
-                jsonArgs[paramNames[i]] = arguments[i];
+            if (paramNames != null) {
+                for (var i = 0; i < paramNames.length; i++) {
+                    jsonArgs[paramNames[i]] = arguments[i];
+                }
             }
 
             var eventName = typeName + "." + methodName;

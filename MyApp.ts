@@ -1,12 +1,14 @@
-﻿/// <reference path="Weaver.ts"/>
-/// <reference path="CQRS.ts"/>
+﻿
+import weaver = module("Weaver");
+import cqrs = module("CQRS");
+import db = module("db");
 
-
-
-class Person extends CQRS.AggregateRoot {
+class Person extends cqrs.CQRS.AggregateRoot {
 	
     private firstname: string;
     private lastname: string;
+    private age: number;
+
     constructor() {
        super();
     }
@@ -21,15 +23,54 @@ class Person extends CQRS.AggregateRoot {
     private renamedEvent(newName: string) {
         this.firstname = newName;
     }
+
+    public sayHello() {
+        this.saidHelloEvent();
+    }
+
+    private saidHelloEvent() {      
+    }
+
+    public growOlder() {
+        this.AgedEvent();
+    }
+
+    private AgedEvent() {
+        this.age++;
+    }
 }
 
-Weaver.makeInterceptType(Person);
+weaver.Weaver.makeInterceptType(Person);
 
-var b = new Person();
 
-b.rename("Roger");
+function createPerson() {
+    var b = new Person();
 
-var events = b.getEvents();
+    b.rename("Roger");
+    b.sayHello();
+    b.growOlder();
+    b.growOlder();
 
-for(var i =0;i<events.length;i++)
-	alert( "event found " + events[i]);
+    var events = b.getEvents();
+
+    db.addEvents("1", events, function 
+    {
+        db.close();
+    });
+
+}
+
+function readPerson() {
+    db.getEvents("1", events =>
+    {
+        for (var i = 0; i < events.length; i++)
+        console.log("event found " + events[i]);
+
+    var c = new Person();
+    c.replayEvents(events, true);
+        db.close();
+    });    
+}
+
+//createPerson();
+readPerson();
