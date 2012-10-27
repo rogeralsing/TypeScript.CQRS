@@ -27,10 +27,11 @@
 
             var eventName = typeName + "." + methodName;
             jsonObj[eventName] = jsonArgs;
+            jsonObj["id"] = this["_id"];
 
             var jsonStr = JSON.stringify(jsonObj);
 
-            tmp.apply(tmp, arguments);
+            tmp.apply(this, arguments);
             this.store(jsonStr);
         };
     }

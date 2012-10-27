@@ -2,7 +2,7 @@
     export class AggregateRoot {
         
         public _id: string;
-        events: string[];
+        private events: string[];
 
         constructor () {
             this.events = new string[];
