@@ -41,7 +41,7 @@
                         args2.push(args[arg]);
 
                     this[shortEventName].apply(this, args2);
-                    return; //should only be one prop in serialized event
+                    break; //should only be one prop in serialized event
                 }
             }
         }
