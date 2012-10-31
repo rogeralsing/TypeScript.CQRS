@@ -1,4 +1,10 @@
 ﻿export module CQRS {
+
+    export class Repository {
+        constructor () {
+        }
+    }
+
     export class AggregateRoot {
         
         public _id: string;
@@ -30,10 +36,12 @@
                     var shortEventName = fullEventName.split(".")[1];
                     var args = obj[fullEventName];
 
-                    this[shortEventName].apply(this, args);
+                    var args2 = [];
+                    for(var arg in args)
+                        args2.push(args[arg]);
 
-                    //console.log(shortEventName);
-                    break; //should only be one prop in serialized event
+                    this[shortEventName].apply(this, args2);
+                    return; //should only be one prop in serialized event
                 }
             }
         }

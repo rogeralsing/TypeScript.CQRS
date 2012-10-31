@@ -31,8 +31,9 @@
 
             var jsonStr = JSON.stringify(jsonObj);
 
-            tmp.apply(this, arguments);
+            var result = tmp.apply(this, arguments);
             this.store(jsonStr);
+            return result; //events should not have return values anyway
         };
     }
 

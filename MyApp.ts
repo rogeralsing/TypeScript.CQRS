@@ -21,7 +21,7 @@ class Order extends cqrs.CQRS.AggregateRoot {
 
     private details: OrderDetail[];
     private status: OrderStatus;
-    private foo: string = "hej";
+
     constructor() {        
        super();
        this.details = new OrderDetail[];
@@ -42,8 +42,10 @@ class Order extends cqrs.CQRS.AggregateRoot {
     }
 
     private productAddedEvent(productId: number, quantity: number, price: number) {
-        this.details.push(new OrderDetail(productId, quantity, price));            
-       // console.log("foo is = " + this.foo);
+        this.details.push(new OrderDetail(productId, quantity, price));        
+    //    console.log("product is " + productId);
+    //    console.log("quantity is " + quantity);
+
     }
 }
 
@@ -84,6 +86,18 @@ class Person extends cqrs.CQRS.AggregateRoot {
     }
 }
 
+class OrderRepository extends  cqrs.CQRS.Repository {
+    public FindById(entityId: string, callback : (order:Order) => void ) {
+        db.getEvents(entityId, events =>
+        {
+            var order = new Order();
+            order.replayEvents(events, true);
+            callback(order);
+            db.close();
+        });        
+    }
+}
+
 weaver.Weaver.makeInterceptType(Person);
 weaver.Weaver.makeInterceptType(Order);
 
@@ -119,13 +133,17 @@ function readPerson() {
     });    
 }
 
-var order = new Order();
-order.addProduct(123, 22, 666);
-order.addProduct(222, 1, 55);
-order.addProduct(333, 2, 33);
-order.ship();
+//var order = new Order();
+//order.addProduct(123, 22, 666);
+//order.addProduct(222, 1, 55);
+//order.addProduct(333, 2, 33);
+//order.ship();
 
 //var events = order.getEvents();
+var repo = new OrderRepository();
+repo.FindById("3", o => {
+    console.log(o);
+});
 
 //db.addEvents("3", events, function 
 //    {
