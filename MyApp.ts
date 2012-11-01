@@ -46,23 +46,8 @@ class Order extends cqrs.CQRS.AggregateRoot {
 }
 
 class OrderRepository extends  cqrs.CQRS.Repository {
-    public findById(entityId: string, callback : (order:Order) => void ) {
-        db.getEvents(entityId, events =>
-        {
-            var order = new Order();
-            order._id = entityId;
-            order.replayEvents(events, true);
-            order.clearEvents();
-            callback(order);
-            db.close();
-        });        
-    }
-
-    public save(order: Order, callback : () => void) {
-        db.addEvents(order._id, order.getEvents(), () => {        
-            db.close(); 
-            callback();
-        });
+    public findById(entityId: string, callback : (order:Order) => void ) {       
+        this.findAggregateById(Order, entityId, callback);
     }
 }
 
@@ -74,6 +59,7 @@ repo.findById("3", o => {
     o.addProduct(777, 333, 444);
     repo.save(o, () =>
     {
+        db.close();
         console.log("done");
     });
 });

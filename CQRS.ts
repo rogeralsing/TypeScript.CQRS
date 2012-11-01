@@ -1,7 +1,29 @@
-﻿export module CQRS {
+﻿
 
+export module CQRS {
+    import db = module("db");
     export class Repository {
         constructor () {
+        }
+
+        public save(entity: AggregateRoot, callback : () => void) {
+            var events = entity.getEvents();
+            db.addEvents(entity._id, events, () => {        
+                callback();
+                //publish events to msgbus
+                //TODO:
+            });
+        }
+
+        public findAggregateById(type: any, entityId:string, callback: (entity: AggregateRoot) => void ) {
+            var entity = new type();
+            entity._id = entityId;
+            db.getEvents(entityId, events =>
+            {                        
+                entity.replayEvents(events, true);
+                entity.clearEvents();
+                callback(entity);
+            });    
         }
     }
 
