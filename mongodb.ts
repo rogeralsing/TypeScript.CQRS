@@ -25,7 +25,8 @@ interface MongoCollection {
    find(query: any, callback?: (err: any, result: any) => void): MongoCursor;
    find(query: any, select: any, callback?: (err: any, result: any) => void): MongoCursor;
    findOne(query: any, callback: (err: any, result: any) => void): void;
-   update(query: any, updates: any, callback: (err: any, result: any) => void): void;
+   //update(query: any, updates: any, callback: (err: any, result: any) => void): void;
+   update(query: any, updates: any,args: any, callback: (err: any, result: any) => void): void;
    insert(query: any, callback: (err: any, result: any) => void): void;
 }
 

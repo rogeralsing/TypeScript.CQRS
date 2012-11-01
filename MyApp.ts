@@ -36,119 +36,44 @@ class Order extends cqrs.CQRS.AggregateRoot {
         this.status = OrderStatus.Shipped;
     }
 
-
     public addProduct(productId: number, quantity: number, price: number) {
         this.productAddedEvent(productId, quantity, price);
     }
 
     private productAddedEvent(productId: number, quantity: number, price: number) {
         this.details.push(new OrderDetail(productId, quantity, price));        
-    //    console.log("product is " + productId);
-    //    console.log("quantity is " + quantity);
-
-    }
-}
-
-class Person extends cqrs.CQRS.AggregateRoot {
-	
-    private firstname: string;
-    private lastname: string;
-    private age: number;
-
-    constructor() {
-       super();
-    }
-	
-    public rename(newName: string) {
-        if (newName == null || newName.length < 1)
-            throw "";
-
-        this.renamedEvent(newName);
-    }
-	
-    private renamedEvent(newName: string) {
-        this.firstname = newName;
-    }
-
-    public sayHello() {
-        this.saidHelloEvent();
-    }
-
-    private saidHelloEvent() {      
-    }
-
-    public growOlder() {
-        this.AgedEvent();
-    }
-
-    private AgedEvent() {
-        this.age++;
     }
 }
 
 class OrderRepository extends  cqrs.CQRS.Repository {
-    public FindById(entityId: string, callback : (order:Order) => void ) {
+    public findById(entityId: string, callback : (order:Order) => void ) {
         db.getEvents(entityId, events =>
         {
             var order = new Order();
+            order._id = entityId;
             order.replayEvents(events, true);
+            order.clearEvents();
             callback(order);
             db.close();
         });        
     }
+
+    public save(order: Order, callback : () => void) {
+        db.addEvents(order._id, order.getEvents(), () => {        
+            db.close(); 
+            callback();
+        });
+    }
 }
 
-weaver.Weaver.makeInterceptType(Person);
 weaver.Weaver.makeInterceptType(Order);
 
-
-function createPerson() {
-    var b = new Person();
-
-    b.rename("Roger");
-    b.sayHello();
-    b.growOlder();
-    b.growOlder();
-
-    var events = b.getEvents();
-
-    db.addEvents("2", events, function 
-    {
-        db.close();
-    });
-}
-
-function readPerson() {
-    db.getEvents("2", events =>
-    {
-        for (var i = 0; i < events.length; i++)
-        console.log("event found " + events[i]);
-
-    var c = new Person();
-    var snapshot = JSON.stringify(c);
-    console.log(snapshot);
-
-    c.replayEvents(events, true);
-        db.close();
-    });    
-}
-
-//var order = new Order();
-//order.addProduct(123, 22, 666);
-//order.addProduct(222, 1, 55);
-//order.addProduct(333, 2, 33);
-//order.ship();
-
-//var events = order.getEvents();
 var repo = new OrderRepository();
-repo.FindById("3", o => {
-    console.log(o);
+repo.findById("3", o => {
+
+    o.addProduct(777, 333, 444);
+    repo.save(o, () =>
+    {
+        console.log("done");
+    });
 });
-
-//db.addEvents("3", events, function 
-//    {
-//        db.close();
-//    });
-
-//createPerson();
-//readPerson();

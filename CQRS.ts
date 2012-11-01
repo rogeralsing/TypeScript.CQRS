@@ -11,7 +11,7 @@
         private events: string[];
 
         constructor () {
-            this.events = new string[];
+            this.clearEvents();
             this._id = "";
         }
 
@@ -23,24 +23,28 @@
             return this.events;
         }
 
+        public clearEvents() {
+            this.events = new string[];
+        }
+
         public replayEvents(replayEvents: string[],debug=false) {
             for (var i = 0; i < replayEvents.length; i++) {
                 var event = replayEvents[i];
-                var obj = JSON.parse(event);
+                var eventObject = JSON.parse(event);
 
                 if (debug)
                     console.log("replaying event : " + event);
 
-                for (var prop in obj) {
+                for (var prop in eventObject) {
                     var fullEventName = prop.toString();
-                    var shortEventName = fullEventName.split(".")[1];
-                    var args = obj[fullEventName];
+                    var eventMethodName = fullEventName.split(".")[1];
+                    var args = eventObject[fullEventName];
 
                     var args2 = [];
                     for(var arg in args)
                         args2.push(args[arg]);
 
-                    this[shortEventName].apply(this, args2);
+                    this[eventMethodName].apply(this, args2);
                     break; //should only be one prop in serialized event
                 }
             }

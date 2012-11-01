@@ -30,33 +30,31 @@ export function getEvents(entityid: string, callback: (events: string[]) => void
 
        //   console.log(result);
 
-          callback(result.events);
+           if (result == null || result.events == null)
+               callback([]);
+           else
+                callback(result.events);
        });
    });
 }
 
 
 
-export function addEvents(entityId: string, events: string[] , callback: () => void) {
+    export function addEvents(entityId: string, events: string[] , callback: () => void) {
 
- //  console.log("trying to save events for " + entityId);
-
-   db.collection('events', function(error, eventCollection) {
-       if(error) { 
-           console.error(error); return; 
-       }
-//       console.log("saving events for " + entityId);
-       eventCollection.insert({ _id: entityId, events:  events },
-           function(error, result) {
-               if(error) { 
-                   console.error(error); return; 
-               }
-//               console.log("saved events for " + entityId);
-               callback();
+       db.collection('events', function(error, eventCollection) {
+           if(error) { 
+               console.error(error); return; 
            }
-       );
-   });
-}
+           eventCollection.update({ _id: entityId }, { $pushAll : { events: events } }, {upsert: true},
+               function(error, result) {
+                   if(error) { 
+                       console.error(error); return; 
+                   }
+                   callback();
+               });
+       });
+    }
 
 
 export function close() {
